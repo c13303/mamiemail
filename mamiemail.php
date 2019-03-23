@@ -23,7 +23,8 @@ function get_word() {
         $word = $ligne['word'];
         $id = $ligne['id'];
     }
-    if(!$id) return (null);
+    if (!$id)
+        return (null);
     $conn->query('UPDATE words SET `done`=1 WHERE id =' . $id);
     return($word);
 }
@@ -31,13 +32,45 @@ function get_word() {
 $word = get_word();
 
 if (!$word) { // reset done
-    $conn->query('UPDATE words SET done = 0');   
-    echo PHP_EOL.'flush!';
-    $word = get_word();
+    /* $conn->query('UPDATE words SET done = 0');   
+      echo PHP_EOL.'flush!';
+      $word = get_word();
+     * 
+     */
+
+    $mail = new PHPMailer;
+
+//$mail->SMTPDebug = 3;                               // Enable verbose debug output
+
+    $mail->isSMTP();                                      // Set mailer to use SMTP
+    $mail->Host = $params['host'];  // Specify main and backup SMTP servers
+    $mail->SMTPAuth = true;                               // Enable SMTP authentication
+    $mail->Username = $params['senderaccount'];                 // SMTP username
+    $mail->Password = $params['senderpass'];                           // SMTP password
+    $mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
+    $mail->Port = 587;                                    // TCP port to connect to
+//$mail->SMTPDebug = 1;
+    $mail->setFrom($params['sender'], 'Mamie Email');
+    $mail->addAddress($params['sender']);
+    $mail->isHTML(true);
+
+    $mail->Subject = 'Mamie Mail : database is empty';
+    $mail->Body = 'You need to flush the database of daily mail, or reload it';
+    echo PHP_EOL . 'ERROR  : ' . date('d/m/Y') . ' : ';
+    if (!$mail->send()) {
+        echo PHP_EOL . 'Message could not be sent.';
+        echo PHP_EOL . 'Mailer Error: ' . $mail->ErrorInfo;
+    } else {
+        // echo PHP_EOL . 'Message has been sent ' . $word;
+    }
+    echo $word;
+
+    $conn->close();
+    die();
 }
 
-if(!$word)
-    die(PHP_EOL.'word error missing'.PHP_EOL);
+if (!$word)
+    die(PHP_EOL . 'word error missing' . PHP_EOL);
 
 
 $mail = new PHPMailer;
@@ -56,15 +89,15 @@ $mail->setFrom($params['sender'], $params['sendername']);
 $mail->addAddress($params['dest']);     // Add a recipient
 $mail->isHTML(true);                                  // Set email format to HTML
 
-$mail->Subject = 'Bisou du jour';
+$mail->Subject = 'Re: Bisou du jour';
 $mail->Body = $word;
 
-echo PHP_EOL . 'Sending : ' . date('d/m/Y'). ' : ';
+echo PHP_EOL . 'Sending : ' . date('d/m/Y') . ' : ';
 if (!$mail->send()) {
     echo PHP_EOL . 'Message could not be sent.';
     echo PHP_EOL . 'Mailer Error: ' . $mail->ErrorInfo;
 } else {
-   // echo PHP_EOL . 'Message has been sent ' . $word;
+    // echo PHP_EOL . 'Message has been sent ' . $word;
 }
 echo $word;
 
