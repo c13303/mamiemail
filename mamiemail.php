@@ -5,10 +5,10 @@
  * User: c13303
  * Date: 11/07/16
  * Time: 18:22
- * crontab EX : 0 9 * * * sleep $((3600 * (RANDOM % 12))); /usr/bin/php /home/charles/mamiemail/mamiemail.php > log.txt
+ * 
  */
 error_reporting(E_ALL);
-error_reporting(0);
+
 
 require('PHPMailer-master/PHPMailerAutoload.php');
 require('params.php');
@@ -102,8 +102,10 @@ while (1) {
 //$mail->SMTPDebug = 1;
             $mail->setFrom($params['sender'], $params['sendername']);
             $mail->addAddress($params['dest']);     // Add a recipient
+
             $mail->isHTML(true);                                  // Set email format to HTML
 
+            $presujet = '';
             $de = rand(0, 3);
             switch ($de) {
                 case 0:
@@ -112,23 +114,32 @@ while (1) {
                 case 1:
                     $presujet = 'bisous ';
                     break;
-                case 2:
-                    $presujet = '';
-                    break;
             }
-            
-             $de = rand(0, 3);
+
+            $de = rand(0, 10);
+            $presujet .= 'mamie ';
             switch ($de) {
                 case 0:
-                    $presujet .= ' mamie';
+                    $presujet .= 'mamie ';
                     break;
                 case 1:
-                    $presujet .= ' ';
+                    $presujet .= 'ma mamie ';
                     break;
                 case 2:
-                    $presujet .= ' ';
+                    $presujet .= 'madame Chang ';
+                    break;
+                case 3:
+                    $presujet .= 'Agnès ';
+                    break;
+                case 4:
+                    $presujet .= '';
+                    break;
+                case 5:
+                    $presujet .= '';
                     break;
             }
+
+
 
             $sujet = explode(' ', $word);
             $suj = $sujet[0];
